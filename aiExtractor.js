@@ -1,11 +1,15 @@
 // aiExtractor.js
 // use LLM to extract structured data from messy HTML
-import axios from "axios";
 import dotenv from "dotenv";
+import OpenAI from "openai";
+
 dotenv.config()
 
-const API_URL = "https://api.siliconflow.com/v1/chat/completions";
-const MODEL = "deepseek-ai/DeepSeek-V3.1-Terminus";
+const openai = new OpenAI({
+        baseURL: 'https://api.deepseek.com',
+        apiKey: process.env.DEEPSEEK_API_KEY,
+});
+const MODEL = "deepseek-chat";
 
 /**
  * sends raw HTML to AI model for structured json extraction
@@ -69,9 +73,8 @@ export async function AIExtractor(rawHTML){
     `
 
     try {
-        // send post request to AI API
-        const response = await axios.post(
-            API_URL,
+        // send post request to deepseek
+        const response = await openai.chat.completions.create(
             {
                 model: MODEL,
                 messages: [
@@ -83,13 +86,6 @@ export async function AIExtractor(rawHTML){
                     { role: "user", content: prompt },
                 ],
                 // temperature: 0.1,
-            },
-            {
-                headers: {
-                Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-                "Content-Type": "application/json",
-                },
-                timeout: 45000
             }
         );
 

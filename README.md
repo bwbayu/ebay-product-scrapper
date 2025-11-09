@@ -1,7 +1,7 @@
 ﻿# eBay + AI Web Scraper
 
 ## Overview
-This service pairs a Puppeteer-powered eBay scraper (`scraper.js`) with a lightweight Express API (`index.js`). It walks the search results for a keyword, visits each listing detail page (three at a time via `p-limit`), sanitizes the HTML, lets `aiExtractor.js` normalize it through SiliconFlow, stores the array in `ebay_scraping_results.json`, and returns the same structured data to the client.
+This service pairs a Puppeteer-powered eBay scraper (`scraper.js`) with a lightweight Express API (`index.js`). It walks the search results for a keyword, visits each listing detail page (three at a time via `p-limit`), sanitizes the HTML, lets `aiExtractor.js` normalize it through DeepSeek, stores the array in `ebay_scraping_results.json`, and returns the same structured data to the client.
 
 ### GET /scrapeEbay
 | Query | Required | Description | Default |
@@ -13,9 +13,9 @@ Responses contain an array of `{ id, url, title, primaryPrice, approxPrice, desc
 
 ## Environment (.env)
 1. Copy the template: `cp .env.example .env` (or create the file manually).
-2. Provide the SiliconFlow credential:
+2. Provide the DeepSeek credential:
 ```env
-SILICONFLOW_API_KEY=your_api_key_here
+DEEPSEEK_API_KEY=your_api_key_here
 ```
 3. Variables are loaded via `dotenv` at process start; restart `node index.js` after editing `.env`.
 
