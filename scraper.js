@@ -72,7 +72,7 @@ async function scrapeItemDetail(page, id) {
         });
         // extract the body content from fetched HTML
         const match = data.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-        fullDescriptionHTML = match ? match[1].trim() : data.trim();
+        fullDescriptionHTML = match ? match[1].trim() : data.trim(); // get the HTML inside the body element
       } catch (err) {
         console.warn(`failed to get iframe URL for ${id}:`, err.message);
       }
@@ -127,16 +127,19 @@ export async function scrapeEbay(keyword = "nike", maxPages = 1) {
         
         // wait for item listings to appear
         try {
-          await pageList.waitForSelector("ul.srp-results.srp-grid.clearfix li[data-listingid]", { timeout: 60000 });
+          await pageList.waitForSelector(
+            "div.srp-river-results.clearfix ul li[data-listingid], ul.srp-results.srp-list.clearfix li[data-listingid]",
+            { timeout: 60000 }
+          );
         } catch {
           console.log(`No items found on page ${i}, stopping.`);
-          break; // stop the process if no items found
+          break;
         }
 
         // extract all item ids from the listing page
         let itemIds = await pageList.$$eval(
-          'ul.srp-results.srp-grid.clearfix > li[data-listingid]',
-          (els) => els.map((el) => el.getAttribute("data-listingid"))
+          "div.srp-river-results.clearfix ul li[data-listingid], ul.srp-results.srp-list.clearfix li[data-listingid]",
+          (els) => els.map((el) => el.getAttribute("data-listingid")).filter(Boolean) // filter null
         );
 
         // double check if any items were found
@@ -209,6 +212,8 @@ export async function scrapeEbay(keyword = "nike", maxPages = 1) {
     // save final result to JSON file
     const outputFile = "ebay_scraping_results.json";
     fs.writeFileSync(outputFile, JSON.stringify(allResults, null, 2), "utf-8");
+    const outputFileRaw = "ebay_scraping_results_raw.json";
+    fs.writeFileSync(outputFileRaw, JSON.stringify(scrapingQueue, null, 2), "utf-8");
     console.log(`Scraping complete. Data saved to ${outputFile}`);
 
     return allResults;

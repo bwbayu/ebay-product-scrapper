@@ -90,7 +90,7 @@ export async function AIExtractor(rawHTML){
         );
 
         // extract the AI response
-        const output = response.data.choices?.[0]?.message?.content || "{}";
+        const output = response.choices?.[0]?.message?.content || "{}";
 
         // parse JSON and merge with item id and url
         const parsed = JSON.parse(output);
